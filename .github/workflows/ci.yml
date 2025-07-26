@@ -92,7 +92,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YC_SA_KEY: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
-      YC_OAUTH_TOKEN: ${{ secrets.YC_OAUTH_TOKEN }}
       YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
       YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
       YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
@@ -105,8 +104,8 @@ jobs:
       - name: 🛠 Установка Yandex CLI и настройка
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          export PATH="$HOME/yandex-cloud/bin:$PATH"
           echo "$YC_SA_KEY" | base64 -d > key.json
+          export PATH="$HOME/yandex-cloud/bin:$PATH"
 
           yc config profile create default
           yc config set service-account-key key.json
@@ -115,7 +114,7 @@ jobs:
 
           yc container registry configure-docker
 
-      - name: Download model artifact
+      - name: 📥 Загрузка модели
         uses: actions/download-artifact@v4
         with:
           name: model
@@ -140,3 +139,4 @@ jobs:
             --execution-timeout 30s \
             --concurrency 4 \
             --service-account-id $YC_SA_ID
+  
