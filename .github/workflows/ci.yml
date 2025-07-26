@@ -91,6 +91,7 @@ jobs:
 
   deploy:
 #    if: contains(github.event.head_commit.message, '[deploy]')
+    needs: publish
     name: 🚀 Deploy to Yandex Cloud
     runs-on: ubuntu-latest
     steps:
