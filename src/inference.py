@@ -10,7 +10,6 @@ MODEL_PATH = os.path.join(
 
 CSV_URL = 'https://drive.google.com/uc?id=1fekiVOa1A0-n8ZTW68X7kgqfgQ7VjYsR'
 
-
 # Пути к выходным файлам
 PRED_PATH = os.path.join(os.path.dirname(__file__), '..', 'predictions.csv')
 REPORT_PATH = os.path.join(os.path.dirname(__file__), '..', 'report.html')
