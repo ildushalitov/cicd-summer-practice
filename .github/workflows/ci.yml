@@ -131,7 +131,9 @@ jobs:
             --memory 2g \
             --cores 1 \
             --execution-timeout 30s \
-            --concurrency 1
+            --concurrency 1 \
+            --service-account-id ${{ secrets.YC_SA_ID }}
+      
 
       - name: 🌍 Вывод адреса
         run: yc serverless container get --name inference-api --format json | jq -r '.url'
