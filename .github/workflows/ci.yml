@@ -96,7 +96,7 @@ jobs:
       YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
       YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
       YC_SA_ID: ${{ secrets.YC_SA_ID }}
-
+      DOCKER_CONFIG: ${{ github.workspace }}/.docker  # явно укажем путь
     steps:
       - name: 🔄 Checkout репозитория
         uses: actions/checkout@v3
@@ -105,6 +105,8 @@ jobs:
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
           echo "$YC_SA_KEY" | base64 -d > key.json
+          cat key.json
+          
           export PATH="$HOME/yandex-cloud/bin:$PATH"
 
           yc config profile create default
@@ -112,7 +114,11 @@ jobs:
           yc config set cloud-id $YC_CLOUD_ID
           yc config set folder-id $YC_FOLDER_ID
 
+          mkdir -p "$DOCKER_CONFIG"
           yc container registry configure-docker
+          
+          echo "🛠 Проверка ~/.docker/config.json:"
+          cat "$DOCKER_CONFIG/config.json"
 
       - name: 📥 Загрузка модели
         uses: actions/download-artifact@v4
@@ -139,4 +145,3 @@ jobs:
             --execution-timeout 30s \
             --concurrency 4 \
             --service-account-id $YC_SA_ID
-  
