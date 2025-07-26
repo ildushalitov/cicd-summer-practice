@@ -109,6 +109,18 @@ jobs:
           yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
           yc config set service-account-key key.json
 
+      - name: 🔐 Логин в Yandex Container Registry
+        run: |
+          yc config set container-registry-id ${{ secrets.YC_REGISTRY_ID }}
+          yc container registry configure-docker
+
+      - name: 🏷️ Перетегирование и пуш в YCR
+        run: |
+          docker pull ghcr.io/ildushalitov/cicd-summer-practice:latest
+          docker tag ghcr.io/ildushalitov/cicd-summer-practice:latest \
+            cr.yandex/${{ secrets.YC_REGISTRY_ID }}/cicd-summer-practice:latest
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/cicd-summer-practice:latest
+
       - name: 🚀 Деплой контейнера
         run: |
           yc serverless container get --name inference-api || \
@@ -116,7 +128,7 @@ jobs:
 
           yc serverless container revision deploy \
             --container-name inference-api \
-            --image ghcr.io/ildushalitov/cicd-summer-practice:latest \
+            --image cr.yandex/${{ secrets.YC_REGISTRY_ID }}/cicd-summer-practice:latest \
             --memory 2g \
             --cores 1 \
             --execution-timeout 30s \
@@ -124,4 +136,5 @@ jobs:
 
       - name: 🌍 Вывод адреса
         run: yc serverless container get --name inference-api --format json | jq -r '.url'
+  
 
