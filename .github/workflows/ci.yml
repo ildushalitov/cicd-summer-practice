@@ -111,7 +111,6 @@ jobs:
 
       - name: 🔐 Логин в Yandex Container Registry
         run: |
-          yc config set container-registry-id ${{ secrets.YC_REGISTRY_ID }}
           yc container registry configure-docker
 
       - name: 🏷️ Перетегирование и пуш в YCR
@@ -136,5 +135,5 @@ jobs:
 
       - name: 🌍 Вывод адреса
         run: yc serverless container get --name inference-api --format json | jq -r '.url'
-  
+
 
