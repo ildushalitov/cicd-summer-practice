@@ -134,14 +134,6 @@ jobs:
             --concurrency 1 \
             --service-account-id ${{ secrets.YC_SA_ID }}
 
-      - name: 🌐 Сделать контейнер публичным
-        run: |
-          yc serverless container add-access-binding \
-            --name inference-api \
-            --role container.invoker \
-            --subject "allUsers"
-      
-      
 
       - name: 🌍 Вывод адреса
         run: yc serverless container get --name inference-api --format json | jq -r '.url'
