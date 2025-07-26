@@ -85,5 +85,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/karen9955/titanic-api:latest
+          tags: ghcr.io/ildushalitov/cicd-summer-practice:latest
 
