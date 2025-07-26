@@ -36,7 +36,8 @@ def predict(data: VacancyFeatures):
     try:
         X, _ = preprocess_data(df_raw)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка предобработки: {e}")
+        raise HTTPException(status_code=500,
+                            detail=f"Ошибка предобработки: {e}")
 
     try:
         pred = model.predict(X)[0]
