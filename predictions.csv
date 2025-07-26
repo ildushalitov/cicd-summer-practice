@@ -1,6 +1,0 @@
-﻿employees_number,work_schedule,employment,length_of_employment,region_name,accept_teenagers,specialization,response_count,invitation_count,month,day_of_week,industry_[None],industry_[41],industry_[44],industry_[5],industry_[50],"industry_[41, 42]",industry_[15],industry_[13],industry_[43],"industry_[7, 43]",Предсказанная зарплата
-300,full_day,full,up_to_3_years,Новосибирская область,False,Администратор,327,21,2,0,False,False,False,False,False,False,False,False,False,False,41131.80504149927
-50,shift,full,no_experience,Новосибирская область,False,Администратор,47,26,3,4,True,False,False,False,False,False,False,False,False,False,30483.852461080427
-5,shift,full,up_to_3_years,Свердловская область,False,Администратор,11,3,4,2,True,False,False,False,False,False,False,False,False,False,34034.56528213033
-0,full_day,full,up_to_3_years,Новосибирская область,False,"Менеджер по продажам, менеджер по работе с клиентами",15,9,9,3,False,False,False,False,False,False,False,False,False,False,85181.23493730756
-0,full_day,full,up_to_3_years,Приморский край,False,"Менеджер по продажам, менеджер по работе с клиентами",41,49,1,0,False,False,False,False,False,False,False,False,False,False,99664.40199834079
