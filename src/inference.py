@@ -49,7 +49,9 @@ html = f"""
 </head>
 <body>
     <h1>📊 Отчёт о предсказаниях зарплаты</h1>
-    <p><strong>Дата генерации:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+    <p><strong>Дата генерации:</strong> {
+    datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }</p>
     <p><strong>Количество примеров:</strong> {len(X_result)}</p>
     {X_result.to_html(index=False, border=0)}
 </body>

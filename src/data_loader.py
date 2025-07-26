@@ -26,11 +26,13 @@ def preprocess_data(df: pd.DataFrame):
     df["industry_id_list"] = df["industry_id_list"].astype(str)
     top_industries = df["industry_id_list"].value_counts().head(10).index
     for ind in top_industries:
-        df[f"industry_{ind}"] = df["industry_id_list"].apply(lambda x: ind in x)
+        df[f"industry_{ind}"] = (
+            df["industry_id_list"].apply(lambda x: ind in x))
 
     # Признаки и целевая переменная
     features = [
-                   "employees_number", "work_schedule", "employment", "length_of_employment",
+                   "employees_number", "work_schedule",
+                   "employment", "length_of_employment",
                    "region_name", "accept_teenagers", "specialization",
                    "response_count", "invitation_count", "month", "day_of_week"
                ] + [f"industry_{ind}" for ind in top_industries]
@@ -55,7 +57,8 @@ def load_and_preprocess(path: str):
 
 def load_sample_data(path: str, test_size=0.2, random_state=42):
     X, y = load_and_preprocess(path)
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+    return train_test_split(X, y, test_size=test_size,
+                            random_state=random_state)
 
 
 def get_sample_features(path: str, n: int = 5):
