@@ -114,7 +114,7 @@ jobs:
           yc config set folder-id $YC_FOLDER_ID
 
           yc container registry configure-docker
-          echo "${YC_OAUTH_TOKEN}" | docker login cr.yandex --username oauth --password-stdin
+      
 
       - name: 📦 Сборка Docker-образа
         run: |
