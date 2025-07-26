@@ -132,7 +132,9 @@ jobs:
             --cores 1 \
             --execution-timeout 30s \
             --concurrency 1 \
-            --service-account-id ${{ secrets.YC_SA_ID }}
+            --service-account-id ${{ secrets.YC_SA_ID }} \
+            --allow-unauthenticated
+      
       
 
       - name: 🌍 Вывод адреса
