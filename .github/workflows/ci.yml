@@ -114,7 +114,12 @@ jobs:
           yc config set folder-id $YC_FOLDER_ID
 
           yc container registry configure-docker
-      
+
+      - name: 📥 Download model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: model
+          path: models
 
       - name: 📦 Сборка Docker-образа
         run: |
