@@ -88,6 +88,7 @@ jobs:
           tags: ghcr.io/ildushalitov/cicd-summer-practice:latest
 
   deploy:
+    name: 🚀 Deploy to Yandex Cloud
     needs: publish
     runs-on: ubuntu-latest
     env:
@@ -96,35 +97,35 @@ jobs:
       YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
       YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
       YC_SA_ID: ${{ secrets.YC_SA_ID }}
-      DOCKER_CONFIG: ${{ github.workspace }}/.docker  # явно укажем путь
     steps:
       - name: 🔄 Checkout репозитория
         uses: actions/checkout@v3
 
-      - name: 🛠 Установка Yandex CLI и настройка
+      - name: 🛠 Установка Yandex CLI
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          echo "$YC_SA_KEY" | base64 -d > key.json
-          cat key.json
-          
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
           export PATH="$HOME/yandex-cloud/bin:$PATH"
+          yc --version
 
-          yc config profile create default
-          yc config set service-account-key key.json
-          yc config set cloud-id $YC_CLOUD_ID
-          yc config set folder-id $YC_FOLDER_ID
-
-          mkdir -p "$DOCKER_CONFIG"
+      - name: 🔐 Настройка Yandex CLI
+        run: |
+          echo "$YC_SA_KEY" > sa-key.json
+          yc config set service-account-key sa-key.json
+          yc config set cloud-id "$YC_CLOUD_ID"
+          yc config set folder-id "$YC_FOLDER_ID"
           yc container registry configure-docker
-          
-          echo "🛠 Проверка ~/.docker/config.json:"
-          cat "$DOCKER_CONFIG/config.json"
 
       - name: 📥 Загрузка модели
         uses: actions/download-artifact@v4
         with:
           name: model
           path: models
+
+      - name: 🛠 Проверка контейнера
+        run: |
+          yc serverless container get --name cicd-summer-practice || \
+          yc serverless container create --name cicd-summer-practice
 
       - name: 📦 Сборка Docker-образа
         run: |
@@ -134,7 +135,7 @@ jobs:
         run: |
           docker push cr.yandex/${{ env.YC_REGISTRY_ID }}/cicd-summer-practice:latest
 
-      - name: 🚀 Деплой в Yandex Serverless Containers
+      - name: 🚀 Деплой в Serverless Containers
         run: |
           yc serverless container revision deploy \
             --container-name cicd-summer-practice \
@@ -144,4 +145,7 @@ jobs:
             --core-fraction 100 \
             --execution-timeout 30s \
             --concurrency 4 \
-            --service-account-id $YC_SA_ID
+            --service-account-id "$YC_SA_ID"
+
+      - name: 🌍 Открытие публичного доступа (однократно)
+        run: yc serverless container allow-unauthenticated-invoke cicd-summer-practice || true
