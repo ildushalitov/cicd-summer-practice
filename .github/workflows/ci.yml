@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   build:
+    if: "!contains(github.event.head_commit.message, '[deploy]')"
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: ${{ github.workspace }}
@@ -60,6 +61,7 @@ jobs:
             report.html
 
   publish:
+    if: "!contains(github.event.head_commit.message, '[deploy]')" 
     name: Build & Push Docker image to GHCR
     runs-on: ubuntu-latest
     needs: build
@@ -88,9 +90,9 @@ jobs:
           tags: ghcr.io/ildushalitov/cicd-summer-practice:latest
 
   deploy:
+    if: contains(github.event.head_commit.message, '[deploy]')
     name: 🚀 Deploy to Yandex Cloud
     runs-on: ubuntu-latest
-    needs: publish
     steps:
       - name: 🔄 Checkout репозитория
         uses: actions/checkout@v3
@@ -106,20 +108,19 @@ jobs:
           yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
           yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
           yc config set service-account-key key.json
-          yc config list
 
-      - name: 🚀 Обновление/создание контейнера
+      - name: 🚀 Деплой контейнера
         run: |
           yc serverless container get --name inference-api || \
           yc serverless container create --name inference-api
 
-          yc serverless container update \
-            --name inference-api \
+          yc serverless container revision deploy \
+            --container-name inference-api \
             --image ghcr.io/ildushalitov/cicd-summer-practice:latest \
             --memory 2g \
             --cores 1 \
             --execution-timeout 30s \
             --concurrency 1
 
-      - name: 🌍 Вывод адреса сервиса
+      - name: 🌍 Вывод адреса
         run: yc serverless container get --name inference-api --format json | jq -r '.url'
