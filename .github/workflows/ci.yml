@@ -87,3 +87,51 @@ jobs:
           push: true
           tags: ghcr.io/ildushalitov/cicd-summer-practice:latest
 
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    env:
+      YC_SA_KEY: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
+      YC_OAUTH_TOKEN: ${{ secrets.YC_OAUTH_TOKEN }}
+      YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+      YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+      YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
+      YC_SA_ID: ${{ secrets.YC_SA_ID }}
+
+    steps:
+      - name: 🔄 Checkout репозитория
+        uses: actions/checkout@v3
+
+      - name: 🛠 Установка Yandex CLI и настройка
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          export PATH="$HOME/yandex-cloud/bin:$PATH"
+          echo "$YC_SA_KEY" > key.json
+
+          yc config profile create default
+          yc config set service-account-key key.json
+          yc config set cloud-id $YC_CLOUD_ID
+          yc config set folder-id $YC_FOLDER_ID
+
+          yc container registry configure-docker
+          echo "${YC_OAUTH_TOKEN}" | docker login cr.yandex --username oauth --password-stdin
+
+      - name: 📦 Сборка Docker-образа
+        run: |
+          docker build -t cr.yandex/${{ env.YC_REGISTRY_ID }}/cicd-summer-practice:latest .
+
+      - name: 📤 Публикация Docker-образа
+        run: |
+          docker push cr.yandex/${{ env.YC_REGISTRY_ID }}/cicd-summer-practice:latest
+
+      - name: 🚀 Деплой в Yandex Serverless Containers
+        run: |
+          yc serverless container revision deploy \
+            --container-name cicd-summer-practice \
+            --image cr.yandex/${{ env.YC_REGISTRY_ID }}/cicd-summer-practice:latest \
+            --memory 512m \
+            --cores 1 \
+            --core-fraction 100 \
+            --execution-timeout 30s \
+            --concurrency 4 \
+            --service-account-id $YC_SA_ID
